@@ -39,8 +39,20 @@ export async function getCachedUserCredits(
       .select()
       .single();
 
-    if (insertError || !newRow) return null;
-    row = newRow as UserCreditsRow;
+    if (insertError) {
+      // Concurrent request may have already inserted the row (unique constraint).
+      // Retry the SELECT before giving up so we don't return null on a race.
+      const { data: retryRow } = await supabaseAdmin
+        .from('user_credits')
+        .select('*')
+        .eq('user_id', userId)
+        .single();
+      if (!retryRow) return null;
+      row = retryRow as UserCreditsRow;
+    } else {
+      if (!newRow) return null;
+      row = newRow as UserCreditsRow;
+    }
   }
 
   if (shouldResetCredits(row.credits_reset_at)) {
@@ -51,7 +63,9 @@ export async function getCachedUserCredits(
       .eq('user_id', userId)
       .select()
       .single();
-    row = resetRow ? (resetRow as UserCreditsRow) : { ...row, credits_used: 0, credits_reset_at: resetAt };
+    // Only use DB-confirmed state — never cache a synthetic value that wasn't committed.
+    if (!resetRow) return row;
+    row = resetRow as UserCreditsRow;
   }
 
   queryCache.set(key, row, CREDITS_TTL_MS);

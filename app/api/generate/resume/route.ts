@@ -309,7 +309,7 @@ async function postHandler(request: Request) {
     if (!hasUnlimitedCredits) {
       supabaseAdmin
         .from('credit_usage_log')
-        .insert({ user_id: user.id, action: 'resume', credits_used: creditCost, metadata: { prompt_length: sanitizedPrompt.length } })
+        .insert({ user_id: user.id, action_type: 'resume', credits_used: creditCost, metadata: { prompt_length: sanitizedPrompt.length } })
         .then(({ error }) => { if (error) log.error('Failed to log credit usage:', error); });
     }
 

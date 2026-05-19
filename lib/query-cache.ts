@@ -27,7 +27,14 @@ class QueryCache {
   }
 
   set<T>(key: string, data: T, ttlMs: number): void {
-    if (this.store.size >= 500) this.evictExpired();
+    if (this.store.size >= 500) {
+      this.evictExpired();
+      // If still at/over cap after evicting expired entries, drop the oldest key.
+      if (this.store.size >= 500) {
+        const oldestKey = this.store.keys().next().value;
+        if (oldestKey) this.store.delete(oldestKey);
+      }
+    }
     this.store.set(key, { data, expiresAt: Date.now() + ttlMs });
   }
 
