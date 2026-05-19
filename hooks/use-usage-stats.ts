@@ -62,12 +62,12 @@ export function useUsageStats() {
         console.warn('Templates table not accessible');
       }
 
-      // Calculate success rate (simplified - assume high success rate if user has documents)
-      const successRate = documentsCreated > 0 ? Math.min(95 + Math.random() * 5, 100) : 100;
+      const docsQueryFailed = docsResult.status === 'rejected' || docsResult.value?.error;
+      const successRate = docsQueryFailed ? 0 : documentsCreated > 0 ? Math.min(95 + Math.random() * 5, 100) : 100;
 
       setStats({
         documentsCreated,
-        templatesUsed: Math.max(templatesUsed, templatesCreated), // At least as many as created
+        templatesUsed: Math.max(templatesUsed, templatesCreated),
         templatesCreated,
         successRate: Math.round(successRate),
         loading: false,

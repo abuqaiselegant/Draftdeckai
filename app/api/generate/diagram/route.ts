@@ -124,6 +124,7 @@ export async function POST(request: Request) {
       logger.error({ route: 'app/api/generate/diagram/route.ts' }, 'Invalid diagram response:', diagram);
       if (!hasUnlimitedCredits) {
         await refundCredits(supabaseAdmin, user.id, creditCost);
+        invalidateUserCredits(user.id);
       }
       return NextResponse.json(
         {

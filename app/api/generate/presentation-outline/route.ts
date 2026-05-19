@@ -364,10 +364,18 @@ export async function POST(request: Request) {
 
     console.log(`✅ Generated ${outlines.length} slides`);
 
-    // If outlineOnly is requested, return here without generating images/charts
+    // If outlineOnly is requested, reconcile credits then return early.
     if (outlineOnly) {
       console.log('🚀 Returning outline only as requested');
-      return NextResponse.json({ 
+      if (!hasUnlimitedCredits) {
+        const actualCost = outlines.length * creditsPerSlide;
+        const overReserved = estimatedCreditCost - actualCost;
+        if (overReserved > 0) {
+          await refundCredits(supabaseAdmin, user.id, overReserved);
+        }
+        invalidateUserCredits(user.id);
+      }
+      return NextResponse.json({
         outlines: outlines,
         stats: {
           totalSlides: outlines.length,
