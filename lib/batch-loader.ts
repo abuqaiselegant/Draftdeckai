@@ -12,6 +12,11 @@ interface Loader<K, V> {
   loadMany: (keys: K[]) => Promise<(V | null)[]>;
 }
 
+/**
+ * Creates a DataLoader that batches all load(key) calls arriving in the same
+ * event-loop tick into a single batchFn invocation. Deduplicates repeated keys
+ * so each key appears only once per batch.
+ */
 export function createBatchLoader<K extends string | number, V>(
   batchFn: BatchFn<K, V>
 ): Loader<K, V> {
@@ -61,6 +66,7 @@ export function createBatchLoader<K extends string | number, V>(
 
 // Concrete loader for user_credits — batches concurrent per-user fetches
 // into one SELECT WHERE user_id IN (...) rather than N separate SELECTs.
+/** Concrete loader for user_credits — batches concurrent per-user fetches into one SELECT WHERE user_id IN (...). */
 export function createCreditsLoader(supabaseAdmin: SupabaseClient) {
   return createBatchLoader<string, UserCreditsRow>(async (userIds) => {
     const { data } = await supabaseAdmin

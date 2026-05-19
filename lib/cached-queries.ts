@@ -8,6 +8,11 @@ import type { UserCreditsRow } from './credit-operations';
 // but eliminates repeated DB reads within a single generate-request burst.
 const CREDITS_TTL_MS = 15_000;
 
+/**
+ * Returns the user_credits row for the given user, served from a 15s in-memory
+ * cache. Creates the row if it does not exist and resets credits if the monthly
+ * reset date has passed. Handles concurrent first-insert races via retry SELECT.
+ */
 export async function getCachedUserCredits(
   supabaseAdmin: SupabaseClient,
   userId: string
@@ -72,6 +77,7 @@ export async function getCachedUserCredits(
   return row;
 }
 
+/** Immediately removes the cached credits row so the next read hits the DB. */
 export function invalidateUserCredits(userId: string): void {
   queryCache.invalidate(cacheKeys.userCredits(userId));
 }
