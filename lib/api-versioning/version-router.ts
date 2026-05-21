@@ -16,7 +16,8 @@ export function detectVersion(request: NextRequest): ApiVersion {
   const { pathname, searchParams } = request.nextUrl;
 
   // 1. URL path — most explicit, highest priority
-  const pathMatch = pathname.match(/^\/api\/(v\d+)\//);
+  // (?:\/|$) matches both /api/v1/health and /api/v1 (no trailing slash)
+  const pathMatch = pathname.match(/^\/api\/(v\d+)(?:\/|$)/);
   if (pathMatch) {
     const candidate = pathMatch[1] as ApiVersion;
     if (isSupported(candidate)) return candidate;

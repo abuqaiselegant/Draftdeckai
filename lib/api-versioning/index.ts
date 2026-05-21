@@ -29,11 +29,13 @@ export function convertV1ResumeToV2(body: V1ResumeInput): V2ResumeInput {
       .map((s) => s.trim())
       .filter(Boolean)
       .join(', ');
-    promptParts.push(`Key skills: ${skillList}.`);
+    // Guard against whitespace-only input producing "Key skills: ."
+    if (skillList) promptParts.push(`Key skills: ${skillList}.`);
   }
 
-  if (additionalContext) {
-    promptParts.push(additionalContext.trim());
+  const trimmedContext = additionalContext?.trim();
+  if (trimmedContext) {
+    promptParts.push(trimmedContext);
   }
 
   return {

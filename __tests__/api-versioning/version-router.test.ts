@@ -21,8 +21,16 @@ describe('detectVersion — URL path', () => {
     expect(detectVersion(req('http://localhost/api/v1/health'))).toBe('v1');
   });
 
+  it('returns v1 for /api/v1 without trailing slash', () => {
+    expect(detectVersion(req('http://localhost/api/v1'))).toBe('v1');
+  });
+
   it('returns v2 for /api/v2/ prefix', () => {
     expect(detectVersion(req('http://localhost/api/v2/documents'))).toBe('v2');
+  });
+
+  it('returns v2 for /api/v2 without trailing slash', () => {
+    expect(detectVersion(req('http://localhost/api/v2'))).toBe('v2');
   });
 
   it('returns v2 (default) for unversioned path', () => {
@@ -149,6 +157,24 @@ describe('convertV1ResumeToV2', () => {
       skills: '',
     });
     expect(result.prompt).not.toContain('Key skills');
+  });
+
+  it('omits whitespace-only skills without appending "Key skills: ."', () => {
+    const result = convertV1ResumeToV2({
+      personalInfo: { name: 'Ada', email: 'ada@example.com' },
+      jobTitle: 'Engineer',
+      skills: '   ,  ,  ',
+    });
+    expect(result.prompt).not.toContain('Key skills');
+  });
+
+  it('omits whitespace-only additionalContext', () => {
+    const result = convertV1ResumeToV2({
+      personalInfo: { name: 'Ada', email: 'ada@example.com' },
+      jobTitle: 'Engineer',
+      additionalContext: '   ',
+    });
+    expect(result.prompt).toBe('Create a professional resume for a Engineer position.');
   });
 });
 
