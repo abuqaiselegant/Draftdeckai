@@ -5,6 +5,10 @@ import { POST as v2POST } from '@/app/api/generate/resume/route';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
 /** v1 resume generation — validates required fields, converts legacy shape (personalInfo, jobTitle, skills CSV) to v2 prompt, then proxies to v2. */
 export async function POST(request: NextRequest): Promise<NextResponseType> {
   let legacyBody: V1ResumeInput;
@@ -14,13 +18,13 @@ export async function POST(request: NextRequest): Promise<NextResponseType> {
     return addDeprecationHeaders(NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 }));
   }
 
-  if (!legacyBody?.personalInfo?.name?.trim()) {
+  if (!isNonEmptyString(legacyBody?.personalInfo?.name)) {
     return addDeprecationHeaders(NextResponse.json({ error: 'personalInfo.name is required' }, { status: 400 }));
   }
-  if (!legacyBody?.personalInfo?.email?.trim()) {
+  if (!isNonEmptyString(legacyBody?.personalInfo?.email)) {
     return addDeprecationHeaders(NextResponse.json({ error: 'personalInfo.email is required' }, { status: 400 }));
   }
-  if (!legacyBody?.jobTitle?.trim()) {
+  if (!isNonEmptyString(legacyBody?.jobTitle)) {
     return addDeprecationHeaders(NextResponse.json({ error: 'jobTitle is required' }, { status: 400 }));
   }
 

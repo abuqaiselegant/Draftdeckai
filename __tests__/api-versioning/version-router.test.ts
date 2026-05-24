@@ -201,6 +201,14 @@ describe('convertV1ResumeToV2', () => {
       convertV1ResumeToV2({ personalInfo: null as never, jobTitle: 'Engineer' })
     ).toThrow();
   });
+
+  it('passes through numeric name/email (isNonEmptyString guard in route catches non-strings before converter)', () => {
+    const result = convertV1ResumeToV2({
+      personalInfo: { name: 42 as never, email: 'ada@example.com' },
+      jobTitle: 'Engineer',
+    });
+    expect(result.name).toBe(42);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -249,5 +257,10 @@ describe('convertV1DocumentToV2', () => {
 
   it('throws when body is null (route layer prevents this reaching the converter)', () => {
     expect(() => convertV1DocumentToV2(null as never)).toThrow();
+  });
+
+  it('passes through numeric name (isNonEmptyString guard in route catches non-strings before converter)', () => {
+    const result = convertV1DocumentToV2({ name: 99 as never, type: 'resume' });
+    expect(result.title).toBe(99);
   });
 });

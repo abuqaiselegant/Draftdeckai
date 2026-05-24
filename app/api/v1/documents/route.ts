@@ -4,6 +4,10 @@ import { POST as v2POST, GET as v2GET } from '@/app/api/documents/route';
 
 export const dynamic = 'force-dynamic';
 
+function isNonEmptyString(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
 /** v1 list documents — proxies to v2 and injects deprecation headers. */
 export async function GET(request: NextRequest): Promise<NextResponseType> {
   const response = await v2GET(request) as NextResponseType;
@@ -19,10 +23,10 @@ export async function POST(request: NextRequest): Promise<NextResponseType> {
     return addDeprecationHeaders(NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 }));
   }
 
-  if (!legacyBody?.name?.trim()) {
+  if (!isNonEmptyString(legacyBody?.name)) {
     return addDeprecationHeaders(NextResponse.json({ error: 'name is required' }, { status: 400 }));
   }
-  if (!legacyBody?.type?.trim()) {
+  if (!isNonEmptyString(legacyBody?.type)) {
     return addDeprecationHeaders(NextResponse.json({ error: 'type is required' }, { status: 400 }));
   }
 
