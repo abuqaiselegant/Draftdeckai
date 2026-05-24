@@ -7,12 +7,14 @@ export interface VersionConfig {
   migrationGuideUrl: string;
 }
 
+const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? '';
+
 export const VERSION_CONFIGS: Record<ApiVersion, VersionConfig> = {
   v1: {
     version: 'v1',
     deprecated: true,
     sunsetDate: '2026-12-31',
-    migrationGuideUrl: '/docs/migration-v1-v2',
+    migrationGuideUrl: `${SITE_ORIGIN}/docs/migration-v1-v2`,
   },
   v2: {
     version: 'v2',

@@ -155,7 +155,7 @@ curl https://draftdeckai.com/api/v1/health
 
 Update your client to log or alert when it receives these headers on any response:
 
-```
+```http
 Deprecation: true
 Sunset: 2026-12-31T23:59:59Z
 Warning: 299 - "API v1 is deprecated..."

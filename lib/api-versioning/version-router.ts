@@ -1,8 +1,6 @@
 import type { NextRequest } from 'next/server';
 import { type ApiVersion, VERSION_CONFIGS } from './types';
 
-const SUPPORTED_VERSIONS: ApiVersion[] = ['v1', 'v2'];
-
 /**
  * Detects the requested API version from a NextRequest.
  *
@@ -40,9 +38,9 @@ export function detectVersion(request: NextRequest): ApiVersion {
   return 'v2';
 }
 
-/** Returns true when the version is both known and configured. */
+/** Returns true when the version is known — derived from VERSION_CONFIGS keys, single source of truth. */
 export function isSupported(version: string): version is ApiVersion {
-  return SUPPORTED_VERSIONS.includes(version as ApiVersion) && version in VERSION_CONFIGS;
+  return version in VERSION_CONFIGS;
 }
 
 /** Returns true when the version is marked deprecated in VERSION_CONFIGS. */

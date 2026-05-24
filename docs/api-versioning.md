@@ -23,7 +23,7 @@ Three mechanisms are supported, evaluated in this priority order:
 
 ### 1. URL path (recommended)
 
-```
+```http
 GET  /api/v2/health
 POST /api/v2/documents
 POST /api/v2/generate/resume
@@ -35,7 +35,7 @@ POST /api/v1/generate/resume ← deprecated
 
 ### 2. Request header
 
-```
+```http
 API-Version: 2
 ```
 
@@ -43,7 +43,7 @@ Accepts bare numbers (`1`, `2`) or prefixed (`v1`, `v2`). Case-insensitive.
 
 ### 3. Query parameter (avoid in production — pollutes logs and caches)
 
-```
+```http
 GET /api/health?api_version=2
 ```
 
@@ -62,7 +62,7 @@ Every response from a v1 endpoint includes these headers:
 | `Deprecation`     | `true`                                               | RFC 8594       |
 | `Sunset`          | `2026-12-31T23:59:59Z`                               | RFC 8594       |
 | `Warning`         | `299 - "API v1 is deprecated..."`                    | RFC 7234 §5.5  |
-| `Link`            | `</docs/migration-v1-v2>; rel="deprecation"`         | RFC 8594       |
+| `Link`            | `<https://draftdeckai.com/docs/migration-v1-v2>; rel="deprecation"` | RFC 8594 |
 | `X-API-Version`   | `v1`                                                 | Custom         |
 | `X-API-Deprecated`| `true`                                               | Custom         |
 | `X-API-Sunset`    | `2026-12-31`                                         | Custom         |
@@ -99,7 +99,7 @@ as `/api/generate/resume`.
 
 ## Version Lifecycle
 
-```
+```text
 Introduced → Stable → Deprecated (Sunset header set) → Removed (after sunset date)
 ```
 
