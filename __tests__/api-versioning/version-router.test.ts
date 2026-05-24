@@ -202,6 +202,24 @@ describe('convertV1ResumeToV2', () => {
     ).toThrow();
   });
 
+  it('ignores non-string skills value without throwing', () => {
+    const result = convertV1ResumeToV2({
+      personalInfo: { name: 'Ada', email: 'ada@example.com' },
+      jobTitle: 'Engineer',
+      skills: 123 as never,
+    });
+    expect(result.prompt).not.toContain('Key skills');
+  });
+
+  it('ignores non-string additionalContext value without throwing', () => {
+    const result = convertV1ResumeToV2({
+      personalInfo: { name: 'Ada', email: 'ada@example.com' },
+      jobTitle: 'Engineer',
+      additionalContext: { note: 'x' } as never,
+    });
+    expect(result.prompt).toBe('Create a professional resume for an Engineer position.');
+  });
+
   it('passes through numeric name/email (isNonEmptyString guard in route catches non-strings before converter)', () => {
     const result = convertV1ResumeToV2({
       personalInfo: { name: 42 as never, email: 'ada@example.com' },

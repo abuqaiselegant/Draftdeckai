@@ -24,7 +24,7 @@ export function convertV1ResumeToV2(body: V1ResumeInput): V2ResumeInput {
     promptParts.push(`The candidate has ${yearsOfExperience} years of experience.`);
   }
 
-  if (skills) {
+  if (typeof skills === 'string' && skills) {
     const skillList = skills
       .split(',')
       .map((s) => s.trim())
@@ -34,7 +34,7 @@ export function convertV1ResumeToV2(body: V1ResumeInput): V2ResumeInput {
     if (skillList) promptParts.push(`Key skills: ${skillList}.`);
   }
 
-  const trimmedContext = additionalContext?.trim();
+  const trimmedContext = typeof additionalContext === 'string' ? additionalContext.trim() : undefined;
   if (trimmedContext) {
     promptParts.push(trimmedContext);
   }
