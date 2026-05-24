@@ -1,3 +1,4 @@
+/** @jest-environment node */
 import { queryCache, cacheKeys } from '../query-cache';
 import { getCachedUserCredits, invalidateUserCredits } from '../cached-queries';
 import { createBatchLoader, createCreditsLoader } from '../batch-loader';
