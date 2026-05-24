@@ -174,7 +174,32 @@ describe('convertV1ResumeToV2', () => {
       jobTitle: 'Engineer',
       additionalContext: '   ',
     });
-    expect(result.prompt).toBe('Create a professional resume for a Engineer position.');
+    expect(result.prompt).toBe('Create a professional resume for an Engineer position.');
+  });
+
+  it('passes through empty name and email strings (route layer enforces non-empty)', () => {
+    const result = convertV1ResumeToV2({
+      personalInfo: { name: '', email: '' },
+      jobTitle: 'Engineer',
+    });
+    expect(result.name).toBe('');
+    expect(result.email).toBe('');
+  });
+
+  it('passes through empty jobTitle string (route layer enforces non-empty)', () => {
+    const result = convertV1ResumeToV2({
+      personalInfo: { name: 'Ada', email: 'ada@example.com' },
+      jobTitle: '',
+    });
+    expect(result.prompt).toContain('Create a professional resume for a');
+    expect(result.name).toBe('Ada');
+    expect(result.email).toBe('ada@example.com');
+  });
+
+  it('throws when personalInfo is null (route layer prevents this reaching the converter)', () => {
+    expect(() =>
+      convertV1ResumeToV2({ personalInfo: null as never, jobTitle: 'Engineer' })
+    ).toThrow();
   });
 });
 
@@ -208,5 +233,21 @@ describe('convertV1DocumentToV2', () => {
     expect(result).not.toHaveProperty('content');
     expect(result).not.toHaveProperty('metadata');
     expect(result).not.toHaveProperty('sections');
+  });
+
+  it('passes through empty name string (route layer enforces non-empty)', () => {
+    const result = convertV1DocumentToV2({ name: '', type: 'resume' });
+    expect(result.title).toBe('');
+    expect(result.documentType).toBe('resume');
+  });
+
+  it('passes through empty type string (route layer enforces non-empty)', () => {
+    const result = convertV1DocumentToV2({ name: 'My Doc', type: '' });
+    expect(result.title).toBe('My Doc');
+    expect(result.documentType).toBe('');
+  });
+
+  it('throws when body is null (route layer prevents this reaching the converter)', () => {
+    expect(() => convertV1DocumentToV2(null as never)).toThrow();
   });
 });

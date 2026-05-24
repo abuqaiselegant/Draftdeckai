@@ -7,16 +7,21 @@ export const runtime = 'nodejs';
 
 /** v1 resume generation — validates required fields, converts legacy shape (personalInfo, jobTitle, skills CSV) to v2 prompt, then proxies to v2. */
 export async function POST(request: NextRequest): Promise<NextResponseType> {
-  const legacyBody = await request.json() as V1ResumeInput;
+  let legacyBody: V1ResumeInput;
+  try {
+    legacyBody = await request.json() as V1ResumeInput;
+  } catch {
+    return addDeprecationHeaders(NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 }));
+  }
 
   if (!legacyBody?.personalInfo?.name?.trim()) {
-    return NextResponse.json({ error: 'personalInfo.name is required' }, { status: 400 });
+    return addDeprecationHeaders(NextResponse.json({ error: 'personalInfo.name is required' }, { status: 400 }));
   }
   if (!legacyBody?.personalInfo?.email?.trim()) {
-    return NextResponse.json({ error: 'personalInfo.email is required' }, { status: 400 });
+    return addDeprecationHeaders(NextResponse.json({ error: 'personalInfo.email is required' }, { status: 400 }));
   }
   if (!legacyBody?.jobTitle?.trim()) {
-    return NextResponse.json({ error: 'jobTitle is required' }, { status: 400 });
+    return addDeprecationHeaders(NextResponse.json({ error: 'jobTitle is required' }, { status: 400 }));
   }
 
   const v2Body = convertV1ResumeToV2(legacyBody);

@@ -129,6 +129,10 @@ describe('addDeprecationHeaders — v2 response (no-op)', () => {
     expect(response.headers.get('Warning')).toBeNull();
   });
 
+  it('does not add Link header', () => {
+    expect(response.headers.get('Link')).toBeNull();
+  });
+
   it('does not add X-API-Deprecated header', () => {
     expect(response.headers.get('X-API-Deprecated')).toBeNull();
   });

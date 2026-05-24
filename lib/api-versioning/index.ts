@@ -17,7 +17,8 @@ import type { V1ResumeInput, V2ResumeInput, V1DocumentInput, V2DocumentInput } f
 export function convertV1ResumeToV2(body: V1ResumeInput): V2ResumeInput {
   const { personalInfo, jobTitle, yearsOfExperience, skills, additionalContext } = body;
 
-  const promptParts: string[] = [`Create a professional resume for a ${jobTitle} position.`];
+  const article = /^[aeiou]/i.test(jobTitle) ? 'an' : 'a';
+  const promptParts: string[] = [`Create a professional resume for ${article} ${jobTitle} position.`];
 
   if (yearsOfExperience !== undefined) {
     promptParts.push(`The candidate has ${yearsOfExperience} years of experience.`);

@@ -12,13 +12,18 @@ export async function GET(request: NextRequest): Promise<NextResponseType> {
 
 /** v1 create document — validates required fields, converts legacy fields (name→title, type→documentType, data→content) then proxies to v2. */
 export async function POST(request: NextRequest): Promise<NextResponseType> {
-  const legacyBody = await request.json() as V1DocumentInput;
+  let legacyBody: V1DocumentInput;
+  try {
+    legacyBody = await request.json() as V1DocumentInput;
+  } catch {
+    return addDeprecationHeaders(NextResponse.json({ error: 'Invalid JSON body' }, { status: 400 }));
+  }
 
   if (!legacyBody?.name?.trim()) {
-    return NextResponse.json({ error: 'name is required' }, { status: 400 });
+    return addDeprecationHeaders(NextResponse.json({ error: 'name is required' }, { status: 400 }));
   }
   if (!legacyBody?.type?.trim()) {
-    return NextResponse.json({ error: 'type is required' }, { status: 400 });
+    return addDeprecationHeaders(NextResponse.json({ error: 'type is required' }, { status: 400 }));
   }
 
   const v2Body = convertV1DocumentToV2(legacyBody);

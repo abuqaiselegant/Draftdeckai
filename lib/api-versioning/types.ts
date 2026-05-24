@@ -7,7 +7,7 @@ export interface VersionConfig {
   migrationGuideUrl: string;
 }
 
-const SITE_ORIGIN = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? '';
+const SITE_ORIGIN = (process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000').replace(/\/$/, '');
 
 export const VERSION_CONFIGS: Record<ApiVersion, VersionConfig> = {
   v1: {
