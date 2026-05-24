@@ -94,6 +94,16 @@ export async function POST(request: Request) {
     const isCoverLetter = jobDescription && fromName;
     const actionType = isCoverLetter ? "cover_letter" : "letter";
 
+    // Validate required fields for the standard-letter branch BEFORE
+    // touching credits — getCachedUserCredits can lazy-create/reset the
+    // user_credits row, so a malformed request must be rejected first.
+    if (!isCoverLetter && (!prompt || !fromName || !toName || !letterType)) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
     // Check user credits
     const creditCost = ACTION_COSTS[actionType];
 
